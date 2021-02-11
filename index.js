@@ -27,10 +27,10 @@ module.exports = class PackageURL {
     let required = {'type': type, 'name': name};
     Object.keys(required).forEach(function(key) {
       if (!required[key]) {
-        throw new Error('Invalid purl: "' + key + '" is a required field.'); 
+        throw new Error('Invalid purl: "' + key + '" is a required field.');
       }
     });
-    
+
     let strings = {'type': type, 'namespace': namespace, 'name': name, 'versions': version, 'subpath': subpath};
     Object.keys(strings).forEach(function(key) {
       if (strings[key] && typeof strings[key] === 'string' || !strings[key]) {
@@ -42,7 +42,7 @@ module.exports = class PackageURL {
     if (qualifiers && typeof qualifiers !== 'object') {
       throw new Error('Invalid purl: "qualifiers" argument must be a dictionary.');
     }
-    
+
     this.type = type;
     this.name = name;
     this.namespace = namespace;
@@ -53,7 +53,7 @@ module.exports = class PackageURL {
 
   toString() {
     var purl = ['pkg:', this.type, '/'];
-    
+
     if (this.namespace) {
       purl.push(encodeURIComponent(this.namespace).replace('%3A', ':'));
       purl.push('/');
@@ -95,7 +95,7 @@ module.exports = class PackageURL {
     if (scheme !== 'pkg') {
       throw new Error('purl is missing the required "pkg" scheme component:');
     }
-    // this strip '/, // and /// as possible in :// or :///    
+    // this strip '/, // and /// as possible in :// or :///
     // from https://gist.github.com/refo/47632c8a547f2d9b6517#file-remove-leading-slash
     remainder = remainder.trim().replace(/^\/+/g, '');
 
@@ -104,7 +104,7 @@ module.exports = class PackageURL {
     if (!type || !remainder) {
       throw new Error('purl is missing the required "type" component:');
     }
-    
+
     let url = new URI(remainder);
     let qualifiers = url.query();
     let subpath = url.fragment();
@@ -112,15 +112,16 @@ module.exports = class PackageURL {
     if (url.username() !== '' || url.password() !== '') {
       throw new Error('Invalid purl: cannot contain a "user:pass@host:port"');
     }
-    
-    // this strip '/, // and /// as possible in :// or :///    
+
+    // this strip '/, // and /// as possible in :// or :///
     // from https://gist.github.com/refo/47632c8a547f2d9b6517#file-remove-leading-slash
     let path = url.path().trim().replace(/^\/+/g, '');
 
     // version is optional - check for existence
+    let version = null
     if (path.includes('@')) {
       let index = path.indexOf('@');
-      let version = path.substring(index + 1);
+      version = path.substring(index + 1);
       remainder = path.substring(0, index);
     } else {
       remainder = path;
