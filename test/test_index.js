@@ -20,4 +20,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-/// <reference path="./src/package-url.d.ts" />
+const assert = require('assert');
+const fs = require('fs');
+
+const TEST_FILE = require(__dirname + '/data/test-suite-data.json');
+
+const PackageURL = require('../index');
+
+describe('PackageURL', function() {
+  TEST_FILE.forEach(function(obj) {
+    if (obj.is_invalid) {
+      it('should raise errors for invalid PackageURLs', function() {
+        try {
+          PackageURL.fromString(obj.purl);
+        } catch(e) {
+          assert.equal(true, e.toString().includes('Error: purl is missing the required'));
+        }
+      })
+    } else {
+      it('should encode/decode valid PackageURLs', function() {
+        var purl = new PackageURL(obj.type, obj.namespace, obj.name, obj.version, obj.qualifiers, obj.subpath);
+        assert.equal(obj.canonical_purl, purl.toString());
+      });
+    }
+  });
+});
